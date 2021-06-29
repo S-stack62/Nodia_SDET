@@ -9,12 +9,18 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.crm.GenericUtils.ExcelUtility;
 import com.crm.GenericUtils.JSONFileUtility;
 import com.crm.GenericUtils.JavaUtility;
 import com.crm.GenericUtils.WebDriverUtility;
+import com.crm.comcast.objectRepository.CreateOrganisationPage;
+import com.crm.comcast.objectRepository.HomePage;
+import com.crm.comcast.objectRepository.LoginPage;
+import com.crm.comcast.objectRepository.OrganisationInformationPage;
+import com.crm.comcast.objectRepository.OrganisationPage;
 
 public class CreateOrganisationWithIndustryTest {
 
@@ -22,13 +28,15 @@ public class CreateOrganisationWithIndustryTest {
 	public void createOrganisationWithIndustry() throws ParseException, Throwable
 	{
 		WebDriverUtility wUtil=new WebDriverUtility();
+		
 		JSONFileUtility jUtil=new JSONFileUtility();
 		String URL=jUtil.readDataFromJSON("url");
 		String USERNAME=jUtil.readDataFromJSON("username");
 		String PASSWORD=jUtil.readDataFromJSON("password");
 		
 		ExcelUtility eUtil=new ExcelUtility();
-		String indus=eUtil.getExcelData("Sheet1", "TC_02", "IndustryType");
+		String organisationName=eUtil.getExcelData("Sheet1", 3, 2) + JavaUtility.getRandomData();
+		String indus=eUtil.getExcelData("Sheet1", 3, 3);
 		
 		//launch browser
 		WebDriver driver=new ChromeDriver();
@@ -38,22 +46,25 @@ public class CreateOrganisationWithIndustryTest {
 		driver.get(URL);
 
 		//login to the Application
-		driver.findElement(By.name("user_name")).sendKeys(USERNAME);
-		driver.findElement(By.name("user_password")).sendKeys(PASSWORD);
-		driver.findElement(By.id("submitButton")).click();
+		LoginPage lp=new LoginPage(driver);
+		lp.login(USERNAME, PASSWORD);
 
 		//Navigate to organizations
-		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
-		driver.findElement(By.linkText("Organizations")).click();
-
+		wUtil.waitUntilPageLoad(driver);
+		HomePage hp=new HomePage(driver);
+		hp.clickOnOrganisation();
+		
 		//Navigate to create Organisation
-		driver.findElement(By.xpath("//img[@title='Create Organization...']")).click();
-		driver.findElement(By.name("accountname")).sendKeys("techM"+JavaUtility.getRandomData());
+		OrganisationPage orgPage=new OrganisationPage(driver);
+		orgPage.clickOnCreateOrganisationImg();
+		
+		CreateOrganisationPage createOrgPage=new CreateOrganisationPage(driver);
+		createOrgPage.createOrganization(organisationName, indus);
 
-		WebElement industry=driver.findElement(By.name("industry"));
-		wUtil.selectOption(industry, indus);
-
-		driver.findElement(By.xpath("//input[@title='Save [Alt+S]']")).click();
+		//Verification
+		OrganisationInformationPage orgInfoPage=new OrganisationInformationPage(driver);
+		String actualOrgInfo=orgInfoPage.getOrganisationText();
+		Assert.assertTrue(actualOrgInfo.contains(organisationName));
 	}
 
 }

@@ -34,7 +34,7 @@ public class WebDriverUtility {
 	 */
 	public void waitUntilPageLoad(WebDriver driver)
 	{
-		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 	}
 	
 	/**

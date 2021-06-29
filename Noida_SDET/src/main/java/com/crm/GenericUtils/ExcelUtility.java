@@ -47,36 +47,32 @@ public class ExcelUtility {
 	{
 		FileInputStream file=new FileInputStream(IPathConstant.EXCELFILEPATH);
 		Workbook workbook=WorkbookFactory.create(file);
-		Sheet sheet=workbook.getSheet(sheetname); //Sheet1
-		int lastRowNum=sheet.getLastRowNum(); //4
+		Sheet sheet=workbook.getSheet(sheetname);
+		int lastRowNum=sheet.getLastRowNum();
 		int expectedRow=0;
 		for(int i=0;i<=lastRowNum;i++)
 		{
-			String testcaseId=sheet.getRow(i).getCell(0).getStringCellValue(); //TC_02
-			System.out.println(testcaseId);
+			String testcaseId=sheet.getRow(i).getCell(0).getStringCellValue();
 			if(testcaseId.equals(tcId))
 			{
-				//expectedRow=i;  //expectedRow=3
 				break;
 			}
-			expectedRow=i;  //expectedRow=3
+			expectedRow=i;
 		}
-		System.out.println(expectedRow);
-		//expectedRow--; //2
 		
 		int excpectedCellNum=0;
-		int lastCell=sheet.getRow(expectedRow).getLastCellNum(); //4
+		int lastCell=sheet.getRow(expectedRow).getLastCellNum();
 		for(int j=0;j<lastCell;j++)
 		{
-			String value=sheet.getRow(expectedRow).getCell(j).getStringCellValue(); //Industry_Type
+			String value=sheet.getRow(expectedRow).getCell(j).getStringCellValue();
 			if(value.equals(header))
 			{
-				excpectedCellNum=j; //j=3
+				excpectedCellNum=j;
 				break;
 			}
 		}
 		
-		String data=sheet.getRow(expectedRow+1).getCell(excpectedCellNum).getStringCellValue(); //Finance
+		String data=sheet.getRow(expectedRow+1).getCell(excpectedCellNum).getStringCellValue();
 		return data;
 		}
 }
